@@ -100,6 +100,7 @@
   thead th.lbl{text-align:left;padding-left:2px;}
   tbody td{padding:4px 6px;border-top:1px solid var(--line);text-align:right;transition:background .12s;}
   tbody td.lbl{text-align:left;font-weight:700;font-size:13px;white-space:nowrap;padding-left:2px;}
+  tbody td.used{white-space:nowrap;}
   tbody tr:first-child td{border-top:none;}
   tbody tr:hover td{background:#fafbfe;}
 
@@ -344,14 +345,22 @@
   const val = el => { const v = parseFloat(el.value); return isFinite(v) ? v : 0; };
 
   function rowCalc(tr, round){
-    const prev = val(tr.querySelector('[data-f="prev"]'));
-    const curr = val(tr.querySelector('[data-f="curr"]'));
+    const prevEl = tr.querySelector('[data-f="prev"]');
+    const currEl = tr.querySelector('[data-f="curr"]');
     const rate = val(tr.querySelector('[data-f="rate"]'));
-    const used = curr - prev;
+    const usedEl = tr.querySelector('[data-o="used"]');
+    const sumEl = tr.querySelector('[data-o="sum"]');
+    // Немає поточного або попереднього показу — рахувати нема з чого
+    if(prevEl.value.trim() === '' || currEl.value.trim() === ''){
+      usedEl.textContent = '—';
+      sumEl.textContent = '—';
+      return 0;
+    }
+    const used = val(currEl) - val(prevEl);
     let sum = used * rate;
     if(round) sum = Math.round(sum*100)/100;
-    tr.querySelector('[data-o="used"]').textContent = fmt(used, used % 1 === 0 ? 0 : 2);
-    tr.querySelector('[data-o="sum"]').textContent = fmt(sum);
+    usedEl.textContent = fmt(used, used % 1 === 0 ? 0 : 2);
+    sumEl.textContent = fmt(sum);
     return sum;
   }
 
@@ -368,8 +377,12 @@
     document.getElementById('grandTotal').textContent = fmt(grand);
 
     // Вулиця №5
-    const used5 = val(document.getElementById('st_curr')) - val(document.getElementById('st_prev'));
-    document.getElementById('st_used').textContent = fmtInt(used5);
+    const stPrev = document.getElementById('st_prev'), stCurr = document.getElementById('st_curr');
+    if(stPrev.value.trim() === '' || stCurr.value.trim() === ''){
+      document.getElementById('st_used').textContent = '—';
+    } else {
+      document.getElementById('st_used').textContent = fmtInt(val(stCurr) - val(stPrev));
+    }
 
     // Період у вигляді «31 травня 2026»
     const periodStr = fmtPeriod(document.getElementById('period').value);
