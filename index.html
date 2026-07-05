@@ -75,7 +75,7 @@
   }
   .period-btn::before{content:"\1F4C5";font-size:13px;}
   .period-btn:hover{border-color:var(--elec);box-shadow:0 0 0 3px rgba(59,91,219,.1);}
-  .period-hidden{position:absolute;right:0;bottom:0;width:1px;height:1px;opacity:0;border:none;padding:0;pointer-events:none;}
+  .period-hidden{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;border:none;padding:0;margin:0;cursor:pointer;-webkit-appearance:none;}
 
   .card{
     background:var(--card);border:1px solid var(--line);border-radius:12px;
@@ -469,11 +469,11 @@
     recalc(); save();
   });
 
-  // Клік по даті відкриває календар
-  document.getElementById('periodBtn').addEventListener('click', () => {
-    const p = document.getElementById('period');
-    if(p.showPicker) { try { p.showPicker(); return; } catch(e){} }
-    p.focus(); p.click();
+  // Клік по даті відкриває календар. Прозоре поле лежить поверх кнопки,
+  // тож на iOS тап відкриває нативний вибір дати; на десктопі — showPicker.
+  const periodInput = document.getElementById('period');
+  periodInput.addEventListener('click', () => {
+    if(periodInput.showPicker){ try { periodInput.showPicker(); } catch(e){} }
   });
 
   load();
